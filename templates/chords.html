@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detected Chords</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎸 Detected Chords</h1>
+
+    {% if filename %}
+        <p class="file-info">Song: <strong>{{ filename }}</strong></p>
+    {% endif %}
+
+    {% if chords %}
+        <a href="{{ url_for('chord_sheet_page') }}" class="chords-btn">
+            Generate Chord Sheet 📄
+        </a>
+
+        <a href="{{ url_for('guitar_assistant_page') }}" class="chords-btn">
+            Guitar Assistant 🎸
+        </a>
+    {% endif %}
+
+    {% if chords %}
+        <div class="timeline">
+            {% for time, chord in chords %}
+                <div class="timeline-row">
+                    <span class="time">{{ time }}s</span>
+                    <span class="chord">{{ chord }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No chords detected yet. Upload and analyze a song first.</p>
+    {% endif %}
+
+    
+
+    <a href="{{ url_for('index') }}" class="back-btn">← Back to Upload</a>
+</div>
+
+</body>
+</html>

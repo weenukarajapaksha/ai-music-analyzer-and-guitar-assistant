@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Music Analyzer</title>
+
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎵 Music Analysis & Guitar Assistant</h1>
+    <h2>Upload Your Audio</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+    
+    <label class="file-label">
+        🎧 Choose Audio File
+        <input type="file" name="audio_file" accept=".mp3,.wav" required hidden>
+    </label>
+
+    <p id="file-name">No file selected</p>
+
+    <button type="submit">Upload Audio</button>
+    </form>
+
+    {% if filename %}
+        <div class="file-info">
+            📁 Uploaded file: <strong>{{ filename }}</strong>
+        </div>
+
+        <audio controls class="audio-player">
+            <source src="{{ url_for('uploaded_file', filename=filename) }}">
+            Your browser does not support the audio element.
+        </audio>
+    {% endif %}
+
+    {% if audio_info %}
+        <div class="info-box">
+            <h3>🎧 Audio Info</h3>
+
+            <p><strong>Duration</strong> <span>{{ audio_info.duration }}</span></p>
+            <p><strong>Seconds</strong> <span>{{ audio_info.total_seconds }}</span></p>
+            <p><strong>Key</strong> <span>{{ audio_info.key }}</span></p>
+            <p><strong>Time Signature</strong> <span>{{ audio_info.time_signature }}</span></p>
+            <p><strong>BPM / Tempo</strong> <span>{{ audio_info.tempo }} BPM</span></p>
+            <p><strong>Sample Rate</strong> <span>{{ audio_info.sample_rate }} Hz</span></p>
+            <p><strong>Beats Detected</strong> <span>{{ audio_info.beats_detected }}</span></p>
+            <p><strong>Mood / Energy</strong> <span>{{ audio_info.mood }}</span></p>
+            <p><strong>Energy Score</strong> <span>{{ audio_info.energy }}</span></p>
+        </div>
+    {% endif %}
+
+    {% if audio_info and audio_info.chords %}
+        <a href="{{ url_for('chords_page') }}" class="chords-btn">
+            View Detected Chords 🎸
+        </a>
+    {% endif %}
+
+    <script>
+        const fileInput = document.querySelector('input[type="file"]');
+        const fileName = document.getElementById('file-name');
+
+        fileInput.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            }
+        });
+    </script>
+
+    {% if message %}
+        <div class="message {% if 'successfully' in message %}success{% else %}error{% endif %}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if filename %}
+        <div class="file-info">
+            📁 Uploaded file: <strong>{{ filename }}</strong>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

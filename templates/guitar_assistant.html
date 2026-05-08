@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guitar Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎸 Guitar Assistant</h1>
+
+    {% if filename %}
+        <p class="file-info">Song: <strong>{{ filename }}</strong></p>
+    {% endif %}
+
+    {% if assistant_data %}
+
+        <div class="assistant-box">
+            <h3>Song Summary</h3>
+            <p><strong>Key</strong> <span>{{ assistant_data.key }}</span></p>
+            <p><strong>BPM</strong> <span>{{ assistant_data.bpm }}</span></p>
+            <p><strong>Practice BPM</strong> <span>{{ assistant_data.practice_bpm }}</span></p>
+            <p><strong>Time Signature</strong> <span>{{ assistant_data.time_signature }}</span></p>
+        </div>
+
+        <div class="assistant-box">
+            <h3>Detected Guitar Chords</h3>
+            <div class="chord-list-page">
+                {% for chord in assistant_data.unique_chords %}
+                    <span class="chord">{{ chord }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="assistant-box">
+            <h3>Suggested Strumming Pattern</h3>
+            <p class="strumming">{{ assistant_data.strumming }}</p>
+        </div>
+
+        <div class="assistant-box">
+            <h3>Easy Chord Suggestions</h3>
+            {% for suggestion in assistant_data.suggestions %}
+                <p>{{ suggestion }}</p>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p>No guitar assistant data available. Upload and analyze a song first.</p>
+    {% endif %}
+
+    <a href="{{ url_for('chord_sheet_page') }}" class="back-btn">← Back to Chord Sheet</a>
+</div>
+
+</body>
+</html>
