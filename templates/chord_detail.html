@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ chord_name }} Chord</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎹 {{ chord_name }} Chord</h1>
+
+    <div class="piano-box">
+        <h3>Piano Visualization</h3>
+
+        <div class="piano" data-chord="{{ chord_name }}">
+            <div class="white-key" data-note="C">C</div>
+            <div class="black-key c-sharp" data-note="C#">C#</div>
+
+            <div class="white-key" data-note="D">D</div>
+            <div class="black-key d-sharp" data-note="D#">D#</div>
+
+            <div class="white-key" data-note="E">E</div>
+            <div class="white-key" data-note="F">F</div>
+            <div class="black-key f-sharp" data-note="F#">F#</div>
+
+            <div class="white-key" data-note="G">G</div>
+            <div class="black-key g-sharp" data-note="G#">G#</div>
+
+            <div class="white-key" data-note="A">A</div>
+            <div class="black-key a-sharp" data-note="A#">A#</div>
+
+            <div class="white-key" data-note="B">B</div>
+        </div>
+    </div>
+
+    <div class="guitar-box">
+        <h3>Guitar Fingering</h3>
+
+        <div class="guitar-diagram">
+            <div class="string">E</div>
+            <div class="string">A</div>
+            <div class="string">D</div>
+            <div class="string">G</div>
+            <div class="string">B</div>
+            <div class="string">e</div>
+        </div>
+
+        <p id="guitar-shape" class="guitar-shape-text"></p>
+    </div>
+
+    <a href="{{ url_for('chords_page') }}" class="back-btn">← Back to Chords</a>
+</div>
+
+<script>
+    const chordNotes = {
+        "C": ["C", "E", "G"],
+        "Cm": ["C", "D#", "G"],
+        "D": ["D", "F#", "A"],
+        "Dm": ["D", "F", "A"],
+        "E": ["E", "G#", "B"],
+        "Em": ["E", "G", "B"],
+        "F": ["F", "A", "C"],
+        "Fm": ["F", "G#", "C"],
+        "G": ["G", "B", "D"],
+        "Gm": ["G", "A#", "D"],
+        "A": ["A", "C#", "E"],
+        "Am": ["A", "C", "E"],
+        "B": ["B", "D#", "F#"],
+        "Bm": ["B", "D", "F#"]
+    };
+
+    const guitarShapes = {
+        "C": "x32010",
+        "Cm": "x35543",
+        "D": "xx0232",
+        "Dm": "xx0231",
+        "E": "022100",
+        "Em": "022000",
+        "F": "133211",
+        "Fm": "133111",
+        "G": "320003",
+        "Gm": "355333",
+        "A": "x02220",
+        "Am": "x02210",
+        "B": "x24442",
+        "Bm": "x24432"
+    };
+
+    const chord = "{{ chord_name }}";
+    const notes = chordNotes[chord] || [];
+
+    document.querySelectorAll("[data-note]").forEach(key => {
+        if (notes.includes(key.dataset.note)) {
+            key.classList.add("active-key");
+        }
+    });
+
+    const shape = guitarShapes[chord] || "Shape not available yet";
+    document.getElementById("guitar-shape").textContent = "Guitar shape: " + shape;
+</script>
+
+</body>
+</html>
