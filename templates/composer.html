@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Compose Guitar Part</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">🎵 AI Music Analyzer</div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('composer_page') }}">Composer</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+    </div>
+</nav>
+
+<div class="composer-container">
+    <h1>🎼 Compose Your Own Guitar Part</h1>
+
+    <div class="composer-settings">
+        <div>
+            <label>Key Signature</label>
+            <select id="key-select">
+                <option value="C Major">C Major</option>
+                <option value="C# Major">C# Major</option>
+                <option value="D Major">D Major</option>
+                <option value="D# Major">D# Major</option>
+                <option value="E Major">E Major</option>
+                <option value="F Major">F Major</option>
+                <option value="F# Major">F# Major</option>
+                <option value="G Major">G Major</option>
+                <option value="G# Major">G# Major</option>
+                <option value="A Major">A Major</option>
+                <option value="A# Major">A# Major</option>
+                <option value="B Major">B Major</option>
+
+                <option value="A Minor">A Minor</option>
+                <option value="A# Minor">A# Minor</option>
+                <option value="B Minor">B Minor</option>
+                <option value="C Minor">C Minor</option>
+                <option value="C# Minor">C# Minor</option>
+                <option value="D Minor">D Minor</option>
+                <option value="D# Minor">D# Minor</option>
+                <option value="E Minor">E Minor</option>
+                <option value="F Minor">F Minor</option>
+                <option value="F# Minor">F# Minor</option>
+                <option value="G Minor">G Minor</option>
+                <option value="G# Minor">G# Minor</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Time Signature</label>
+            <select id="time-select">
+                <option value="4">4/4</option>
+                <option value="3">3/4</option>
+                <option value="6">6/8</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Tempo</label>
+            <input type="number" id="tempo-input" value="100" min="40" max="220">
+        </div>
+
+        <div>
+            <label>Number of Bars</label>
+            <input type="number" id="bars-input" value="4" min="1" max="16">
+        </div>
+    </div>
+
+    <button id="generate-btn" class="chords-btn">
+        Generate Composer Grid
+    </button>
+
+    <div id="notes-panel" class="notes-panel"></div>
+
+    <div id="composition-area" class="composition-area"></div>
+
+    <div class="composer-actions">
+        <button id="clear-btn" class="secondary-btn">Clear</button>
+        <button id="play-btn" class="chords-btn">▶ Play</button>
+    </div>
+
+    <a href="{{ url_for('index') }}" class="back-btn">← Back to Home</a>
+</div>
+
+<script>
+    const scales = {
+        "C Major": ["C", "D", "E", "F", "G", "A", "B"],
+        "C# Major": ["C#", "D#", "F", "F#", "G#", "A#", "C"],
+        "D Major": ["D", "E", "F#", "G", "A", "B", "C#"],
+        "D# Major": ["D#", "F", "G", "G#", "A#", "C", "D"],
+        "E Major": ["E", "F#", "G#", "A", "B", "C#", "D#"],
+        "F Major": ["F", "G", "A", "A#", "C", "D", "E"],
+        "F# Major": ["F#", "G#", "A#", "B", "C#", "D#", "F"],
+        "G Major": ["G", "A", "B", "C", "D", "E", "F#"],
+        "G# Major": ["G#", "A#", "C", "C#", "D#", "F", "G"],
+        "A Major": ["A", "B", "C#", "D", "E", "F#", "G#"],
+        "A# Major": ["A#", "C", "D", "D#", "F", "G", "A"],
+        "B Major": ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+
+        "A Minor": ["A", "B", "C", "D", "E", "F", "G"],
+        "A# Minor": ["A#", "C", "C#", "D#", "F", "F#", "G#"],
+        "B Minor": ["B", "C#", "D", "E", "F#", "G", "A"],
+        "C Minor": ["C", "D", "D#", "F", "G", "G#", "A#"],
+        "C# Minor": ["C#", "D#", "E", "F#", "G#", "A", "B"],
+        "D Minor": ["D", "E", "F", "G", "A", "A#", "C"],
+        "D# Minor": ["D#", "F", "F#", "G#", "A#", "B", "C#"],
+        "E Minor": ["E", "F#", "G", "A", "B", "C", "D"],
+        "F Minor": ["F", "G", "G#", "A#", "C", "C#", "D#"],
+        "F# Minor": ["F#", "G#", "A", "B", "C#", "D", "E"],
+        "G Minor": ["G", "A", "A#", "C", "D", "D#", "F"],
+        "G# Minor": ["G#", "A#", "B", "C#", "D#", "E", "F#"]
+    };
+
+    const chordMap = {
+        "A,C": "Am",
+        "A,E": "Am",
+        "C,E": "C",
+        "C,G": "C",
+        "E,G": "Em",
+        "D,F": "Dm",
+        "F,A": "F",
+        "G,B": "G",
+        "G,D": "G",
+        "B,D": "G"
+    };
+
+    let selectedNote = null;
+
+    const keySelect = document.getElementById("key-select");
+    const timeSelect = document.getElementById("time-select");
+    const tempoInput = document.getElementById("tempo-input");
+    const barsInput = document.getElementById("bars-input");
+
+    const notesPanel = document.getElementById("notes-panel");
+    const compositionArea = document.getElementById("composition-area");
+
+    document.getElementById("generate-btn").addEventListener("click", generateGrid);
+    document.getElementById("clear-btn").addEventListener("click", clearGrid);
+    document.getElementById("play-btn").addEventListener("click", playComposition);
+
+    function generateGrid() {
+        const key = keySelect.value;
+        const beatsPerBar = parseInt(timeSelect.value);
+        const bars = parseInt(barsInput.value);
+        const notes = scales[key];
+
+        selectedNote = null;
+
+        notesPanel.innerHTML = "<h3>Notes in " + key + "</h3>";
+
+        const noteButtons = document.createElement("div");
+        noteButtons.className = "note-buttons";
+
+        notes.forEach(note => {
+            const btn = document.createElement("button");
+            btn.textContent = note;
+            btn.className = "note-btn";
+
+            btn.addEventListener("click", function () {
+                document.querySelectorAll(".note-btn").forEach(b => b.classList.remove("selected-note"));
+                btn.classList.add("selected-note");
+                selectedNote = note;
+            });
+
+            noteButtons.appendChild(btn);
+        });
+
+        notesPanel.appendChild(noteButtons);
+
+        compositionArea.innerHTML = "";
+
+        for (let bar = 0; bar < bars; bar++) {
+            const barDiv = document.createElement("div");
+            barDiv.className = "composer-bar";
+
+            const chordLabel = document.createElement("div");
+            chordLabel.className = "bar-chord-label";
+            chordLabel.textContent = "_";
+            barDiv.appendChild(chordLabel);
+
+            const slotsDiv = document.createElement("div");
+            slotsDiv.className = "slots-row";
+
+            for (let beat = 0; beat < beatsPerBar; beat++) {
+                const slot = document.createElement("button");
+                slot.className = "note-slot";
+                slot.textContent = "_";
+                slot.dataset.bar = bar;
+                slot.dataset.beat = beat;
+
+                slot.addEventListener("click", function () {
+                    if (selectedNote) {
+                        slot.textContent = selectedNote;
+                        updateChordLabels();
+                    }
+                });
+
+                slotsDiv.appendChild(slot);
+            }
+
+            barDiv.appendChild(slotsDiv);
+            compositionArea.appendChild(barDiv);
+        }
+
+        updateChordLabels();
+    }
+
+    function updateChordLabels() {
+        document.querySelectorAll(".composer-bar").forEach(bar => {
+            const slots = bar.querySelectorAll(".note-slot");
+            const notes = [];
+
+            slots.forEach(slot => {
+                if (slot.textContent !== "_") {
+                    notes.push(slot.textContent);
+                }
+            });
+
+            const chordLabel = bar.querySelector(".bar-chord-label");
+
+            if (notes.length >= 2) {
+                const firstTwo = [notes[0], notes[1]].sort().join(",");
+                chordLabel.textContent = chordMap[firstTwo] || guessChord(notes);
+            } else {
+                chordLabel.textContent = "_";
+            }
+        });
+    }
+
+    function guessChord(notes) {
+        if (notes.includes("A") && notes.includes("C")) return "Am";
+        if (notes.includes("C") && notes.includes("E")) return "C";
+        if (notes.includes("G") && notes.includes("B")) return "G";
+        if (notes.includes("D") && notes.includes("F")) return "Dm";
+        if (notes.includes("E") && notes.includes("G")) return "Em";
+        if (notes.includes("F") && notes.includes("A")) return "F";
+        return "Chord?";
+    }
+
+    function clearGrid() {
+        document.querySelectorAll(".note-slot").forEach(slot => {
+            slot.textContent = "_";
+        });
+        updateChordLabels();
+    }
+
+    function playComposition() {
+        const tempo = parseInt(tempoInput.value);
+        const beatDuration = 60 / tempo;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        const noteFreq = {
+            "C": 261.63, "C#": 277.18,
+            "D": 293.66, "D#": 311.13,
+            "E": 329.63,
+            "F": 349.23, "F#": 369.99,
+            "G": 392.00, "G#": 415.30,
+            "A": 440.00, "A#": 466.16,
+            "B": 493.88
+        };
+
+        const slots = document.querySelectorAll(".note-slot");
+
+        slots.forEach((slot, index) => {
+            const note = slot.textContent;
+
+            if (note !== "_" && noteFreq[note]) {
+                const startTime = audioContext.currentTime + index * beatDuration;
+
+                playGuitarNote(audioContext, noteFreq[note], startTime, beatDuration);
+            }
+        });
+    }
+
+
+    function playGuitarNote(audioContext, frequency, startTime, duration) {
+        const osc1 = audioContext.createOscillator();
+        const osc2 = audioContext.createOscillator();
+
+        const gain = audioContext.createGain();
+        const filter = audioContext.createBiquadFilter();
+
+        osc1.type = "triangle";
+        osc2.type = "sawtooth";
+
+        osc1.frequency.setValueAtTime(frequency, startTime);
+        osc2.frequency.setValueAtTime(frequency * 2, startTime);
+
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1800, startTime);
+        filter.frequency.exponentialRampToValueAtTime(500, startTime + duration * 0.8);
+
+        gain.gain.setValueAtTime(0.001, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.35, startTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.9);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioContext.destination);
+
+        osc1.start(startTime);
+        osc2.start(startTime);
+
+        osc1.stop(startTime + duration * 0.9);
+        osc2.stop(startTime + duration * 0.9);
+    }
+
+    generateGrid();
+</script>
+
+<footer class="footer">
+    <p>Built for AI-powered music analysis and guitar practice 🎸</p>
+</footer>
+
+</body>
+</html>
