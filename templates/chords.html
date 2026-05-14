@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detected Chords</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div id="chord-popup" class="hidden-popup">
+    <div class="chord-modal-box">
+        <button type="button" id="close-popup" class="close-popup">×</button>
+
+        <h2 id="popup-chord-name"></h2>
+
+        <h3>🎹 Piano Notes</h3>
+        <div class="piano-keyboard">
+            <div class="white-key" data-note="C">C</div>
+            <div class="black-key c-sharp" data-note="C#">C#</div>
+
+            <div class="white-key" data-note="D">D</div>
+            <div class="black-key d-sharp" data-note="D#">D#</div>
+
+            <div class="white-key" data-note="E">E</div>
+            <div class="white-key" data-note="F">F</div>
+            <div class="black-key f-sharp" data-note="F#">F#</div>
+
+            <div class="white-key" data-note="G">G</div>
+            <div class="black-key g-sharp" data-note="G#">G#</div>
+
+            <div class="white-key" data-note="A">A</div>
+            <div class="black-key a-sharp" data-note="A#">A#</div>
+
+            <div class="white-key" data-note="B">B</div>
+        </div>
+
+        <h3>🎸 Guitar Shape</h3>
+        <div id="popup-guitar-diagram" class="guitar-chord-diagram"></div>
+
+         <p class="shape-text">Shape: <span id="popup-shape-value"></span></p>
+    </div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-logo">🎵 AI Music Analyzer</div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('composer_page') }}">Composer</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>🎸 Detected Chords</h1>
+
+    {% if filename %}
+        <p class="file-info">Song: <strong>{{ filename }}</strong></p>
+    {% endif %}
+
+    {% if chords %}
+        <a href="{{ url_for('chord_sheet_page') }}" class="chords-btn">
+            Generate Chord Sheet 📄
+        </a>
+
+        <a href="{{ url_for('guitar_assistant_page') }}" class="chords-btn">
+            Guitar Assistant 🎸
+        </a>
+
+        <a href="{{ url_for('index') }}" class="back-btn">← Back to Upload</a>
+
+        <p class="chord-hint">
+            💡 Touch a chord to view piano keys and guitar fingering
+        </p>
+
+        <div class="timeline">
+            {% for time, chord in chords %}
+                <div class="timeline-row">
+                    <span class="time">{{ time }}s</span>
+
+                    <button class="chord chord-click" data-chord="{{ chord }}">
+                        {{ chord }}
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+
+
+    {% else %}
+        <p>No chords detected yet. Upload and analyze a song first.</p>
+    {% endif %}
+
+</div>
+
+<script>
+    const chordNotes = {
+        "C": ["C", "E", "G"], "Cm": ["C", "D#", "G"],
+        "C#": ["C#", "F", "G#"], "C#m": ["C#", "E", "G#"],
+        "D": ["D", "F#", "A"], "Dm": ["D", "F", "A"],
+        "D#": ["D#", "G", "A#"], "D#m": ["D#", "F#", "A#"],
+        "E": ["E", "G#", "B"], "Em": ["E", "G", "B"],
+        "F": ["F", "A", "C"], "Fm": ["F", "G#", "C"],
+        "F#": ["F#", "A#", "C#"], "F#m": ["F#", "A", "C#"],
+        "G": ["G", "B", "D"], "Gm": ["G", "A#", "D"],
+        "G#": ["G#", "C", "D#"], "G#m": ["G#", "B", "D#"],
+        "A": ["A", "C#", "E"], "Am": ["A", "C", "E"],
+        "A#": ["A#", "D", "F"], "A#m": ["A#", "C#", "F"],
+        "B": ["B", "D#", "F#"], "Bm": ["B", "D", "F#"]
+    };
+
+    const guitarShapes = {
+        "C": "x32010", "Cm": "x35543",
+        "C#": "x46664", "C#m": "x46654",
+        "D": "xx0232", "Dm": "xx0231",
+        "D#": "x68886", "D#m": "x68876",
+        "E": "022100", "Em": "022000",
+        "F": "133211", "Fm": "133111",
+        "F#": "244322", "F#m": "244222",
+        "G": "320003", "Gm": "355333",
+        "G#": "466544", "G#m": "466444",
+        "A": "x02220", "Am": "x02210",
+        "A#": "x13331", "A#m": "x13321",
+        "B": "x24442", "Bm": "x24432"
+    };
+
+    function createGuitarDiagram(container, shape) {
+        if (!shape) {
+            container.innerHTML = "<p class='diagram-error'>Diagram not available</p>";
+            return;
+        }
+
+        const strings = ["E", "A", "D", "G", "B", "e"];
+        const frets = shape.split("");
+
+        let html = `<div class="diagram-wrapper">`;
+
+        html += `<div class="string-labels">`;
+        strings.forEach(s => {
+            html += `<span>${s}</span>`;
+        });
+        html += `</div>`;
+
+        html += `<div class="fret-board">`;
+
+        for (let row = 0; row <= 4; row++) {
+            html += `<div class="fret-row">`;
+
+            for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+                const fretValue = frets[stringIndex];
+
+                html += `<div class="fret-cell">`;
+
+                if (row === 0) {
+                    if (fretValue === "x") {
+                        html += `<span class="mute">x</span>`;
+                    } else if (fretValue === "0") {
+                        html += `<span class="open">o</span>`;
+                    }
+                }
+
+                if (
+                    fretValue !== "x" &&
+                    fretValue !== "0" &&
+                    parseInt(fretValue) === row + 1
+                ) {
+                    html += `<span class="finger-dot">${fretValue}</span>`;
+                }
+
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+        }
+
+        html += `</div></div>`;
+        container.innerHTML = html;
+    }
+
+    const popup = document.getElementById("chord-popup");
+    const closePopup = document.getElementById("close-popup");
+    const popupChordName = document.getElementById("popup-chord-name");
+    const popupShapeValue = document.getElementById("popup-shape-value");
+    const popupGuitarDiagram = document.getElementById("popup-guitar-diagram");
+
+    function openChordPopup() {
+        popup.classList.remove("hidden-popup");
+    }
+
+    function closeChordPopup() {
+        popup.classList.add("hidden-popup");
+    }
+
+    document.querySelectorAll(".chord-click").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const chord = this.dataset.chord;
+            const notes = chordNotes[chord] || [];
+            const shape = guitarShapes[chord];
+
+            popupChordName.textContent = chord + " Chord";
+            popupShapeValue.textContent = shape || "Not available";
+
+            document.querySelectorAll("#chord-popup [data-note]").forEach(key => {
+                key.classList.remove("active-note");
+
+                if (notes.includes(key.dataset.note)) {
+                    key.classList.add("active-note");
+                }
+            });
+
+            createGuitarDiagram(popupGuitarDiagram, shape);
+
+            openChordPopup();
+        });
+    });
+
+    closePopup.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeChordPopup();
+    });
+
+    popup.addEventListener("click", function (event) {
+        if (event.target === popup) {
+            closeChordPopup();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeChordPopup();
+        }
+    });
+</script>
+
+<footer class="footer">
+    <p>Built for AI-powered music analysis and guitar practice 🎸</p>
+</footer>
+
+</body>
+</html>

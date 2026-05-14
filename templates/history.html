@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">🎵 AI Music Analyzer</div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('composer_page') }}">Composer</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+    </div>
+</nav>
+
+<div class="history-container">
+    <h1>💾 Analysis History</h1>
+
+    {% if history %}
+        <div class="history-list">
+            {% for item in history %}
+                <div class="history-card">
+                    <h3>{{ item.filename }}</h3>
+
+                    <p><strong>BPM:</strong> {{ item.bpm }}</p>
+                    <p><strong>Key:</strong> {{ item.song_key }}</p>
+                    <p><strong>Time Signature:</strong> {{ item.time_signature }}</p>
+                    <p><strong>Mood:</strong> {{ item.mood }}</p>
+                    <p><strong>Date:</strong> {{ item.created_at }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No analysis history yet.</p>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="back-btn">← Back to Upload</a>
+</div>
+
+<footer class="footer">
+    <p>Built for AI-powered music analysis and guitar practice 🎸</p>
+</footer>
+
+</body>
+</html>

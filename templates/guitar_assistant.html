@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guitar Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-logo">🎵 AI Music Analyzer</div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('composer_page') }}">Composer</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>🎸 Guitar Assistant</h1>
+
+    {% if filename %}
+        <p class="file-info">Song: <strong>{{ filename }}</strong></p>
+    {% endif %}
+
+    {% if assistant_data %}
+
+        <div class="assistant-box">
+            <h3>Song Summary</h3>
+            <p><strong>Key</strong> <span>{{ assistant_data.key }}</span></p>
+            <p><strong>BPM</strong> <span>{{ assistant_data.bpm }}</span></p>
+            <p><strong>Practice BPM</strong> <span>{{ assistant_data.practice_bpm }}</span></p>
+            <p><strong>Time Signature</strong> <span>{{ assistant_data.time_signature }}</span></p>
+        </div>
+
+        <div class="assistant-box">
+    <h3>Detected Guitar Chords</h3>
+
+    <div class="chord-card-grid">
+        {% for chord in assistant_data.unique_chords %}
+            <div class="chord-card" data-chord="{{ chord }}">
+                <h4>{{ chord }}</h4>
+
+                <div class="mini-piano">
+                    <span data-note="C">C</span>
+                    <span data-note="C#">C#</span>
+                    <span data-note="D">D</span>
+                    <span data-note="D#">D#</span>
+                    <span data-note="E">E</span>
+                    <span data-note="F">F</span>
+                    <span data-note="F#">F#</span>
+                    <span data-note="G">G</span>
+                    <span data-note="G#">G#</span>
+                    <span data-note="A">A</span>
+                    <span data-note="A#">A#</span>
+                    <span data-note="B">B</span>
+                </div>
+
+                <div class="guitar-chord-diagram"></div>
+                <p class="shape-text">Shape: <span class="shape-value"></span></p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+        <div class="assistant-box">
+            <h3>Suggested Strumming Pattern</h3>
+            <p class="strumming">{{ assistant_data.strumming }}</p>
+        </div>
+
+        <div class="assistant-box">
+            <h3>Easy Chord Suggestions</h3>
+            {% for suggestion in assistant_data.suggestions %}
+                <p>{{ suggestion }}</p>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p>No guitar assistant data available. Upload and analyze a song first.</p>
+    {% endif %}
+
+    <a href="{{ url_for('chord_sheet_page') }}" class="back-btn">← Back to Chord Sheet</a>
+</div>
+
+<script>
+    const chordNotes = {
+        "C": ["C", "E", "G"], "Cm": ["C", "D#", "G"],
+        "C#": ["C#", "F", "G#"], "C#m": ["C#", "E", "G#"],
+        "D": ["D", "F#", "A"], "Dm": ["D", "F", "A"],
+        "D#": ["D#", "G", "A#"], "D#m": ["D#", "F#", "A#"],
+        "E": ["E", "G#", "B"], "Em": ["E", "G", "B"],
+        "F": ["F", "A", "C"], "Fm": ["F", "G#", "C"],
+        "F#": ["F#", "A#", "C#"], "F#m": ["F#", "A", "C#"],
+        "G": ["G", "B", "D"], "Gm": ["G", "A#", "D"],
+        "G#": ["G#", "C", "D#"], "G#m": ["G#", "B", "D#"],
+        "A": ["A", "C#", "E"], "Am": ["A", "C", "E"],
+        "A#": ["A#", "D", "F"], "A#m": ["A#", "C#", "F"],
+        "B": ["B", "D#", "F#"], "Bm": ["B", "D", "F#"]
+    };
+
+    const guitarShapes = {
+        "C": "x32010", "Cm": "x35543",
+        "C#": "x46664", "C#m": "x46654",
+        "D": "xx0232", "Dm": "xx0231",
+        "D#": "x68886", "D#m": "x68876",
+        "E": "022100", "Em": "022000",
+        "F": "133211", "Fm": "133111",
+        "F#": "244322", "F#m": "244222",
+        "G": "320003", "Gm": "355333",
+        "G#": "466544", "G#m": "466444",
+        "A": "x02220", "Am": "x02210",
+        "A#": "x13331", "A#m": "x13321",
+        "B": "x24442", "Bm": "x24432"
+    };
+
+    function createGuitarDiagram(container, shape) {
+        if (!shape || shape === "Not available") {
+            container.innerHTML = "<p class='diagram-error'>Diagram not available</p>";
+            return;
+        }
+
+        const strings = ["E", "A", "D", "G", "B", "e"];
+        const frets = shape.split("");
+
+        let html = `<div class="diagram-wrapper">`;
+
+        html += `<div class="string-labels">`;
+        strings.forEach(s => {
+            html += `<span>${s}</span>`;
+        });
+        html += `</div>`;
+
+        html += `<div class="fret-board">`;
+
+        for (let row = 0; row <= 4; row++) {
+            html += `<div class="fret-row">`;
+
+            for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+                const fretValue = frets[stringIndex];
+
+                html += `<div class="fret-cell">`;
+
+                if (row === 0) {
+                    if (fretValue === "x") {
+                        html += `<span class="mute">x</span>`;
+                    } else if (fretValue === "0") {
+                        html += `<span class="open">o</span>`;
+                    }
+                }
+
+                if (fretValue !== "x" && fretValue !== "0" && parseInt(fretValue) === row + 1) {
+                    html += `<span class="finger-dot">${fretValue}</span>`;
+                }
+
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+        }
+
+        html += `</div>`;
+        html += `</div>`;
+
+        container.innerHTML = html;
+    }
+
+    document.querySelectorAll(".chord-card").forEach(card => {
+        const chord = card.dataset.chord;
+        const notes = chordNotes[chord] || [];
+        const shape = guitarShapes[chord] || "Not available";
+
+        card.querySelectorAll("[data-note]").forEach(key => {
+            if (notes.includes(key.dataset.note)) {
+                key.classList.add("active-note");
+            }
+        });
+
+        card.querySelector(".shape-value").textContent = shape;
+
+        const diagramContainer = card.querySelector(".guitar-chord-diagram");
+        createGuitarDiagram(diagramContainer, shape);
+    });
+</script>
+
+<footer class="footer">
+    <p>Built for AI-powered music analysis and guitar practice 🎸</p>
+</footer>
+
+</body>
+</html>
