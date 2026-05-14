@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, send_from_directory
 import os
+os.environ["NUMBA_DISABLE_JIT"] = "1"
+os.environ["NUMBA_CACHE_DIR"] = "/tmp/numba_cache"
 from datetime import datetime
 import librosa
 import numpy as np
