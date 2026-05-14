@@ -312,7 +312,7 @@ def detect_energy_mood(y, sr):
     return mood, round(float(avg_energy), 4)
 
 def analyze_audio(file_path):
-    y, sr = librosa.load(file_path, sr=None)
+    y, sr = librosa.load(file_path, sr=22050, duration=60, mono=True)
 
     duration = librosa.get_duration(y=y, sr=sr)
 
