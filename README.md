@@ -1,67 +1,150 @@
-🎵 AI Music Analyzer & Guitar Assistant
+# 🎵 AI Music Analyzer & Guitar Assistant
 
-An intelligent web-based music analysis platform built with Flask and Python that allows users to upload songs, analyze musical properties, generate chord sheets, transpose keys, and compose their own guitar parts interactively.
+An intelligent web-based music analysis and guitar assistant platform built with Flask and Python.  
+This system allows users to upload songs, analyze musical features, detect chords, generate chord sheets, transpose songs, and compose their own guitar parts interactively.
 
-🚀 Features
-🎼 Music Analysis
-Upload MP3/WAV audio files
-Automatic BPM / tempo detection
-Key signature detection (Major / Minor)
-Time signature estimation
-Chord progression detection
-Chord timeline visualization
-🎸 Guitar Assistant
-Interactive chord viewer
-Piano key visualization
-Guitar chord diagrams
-Chord popup interface
-Guitar fingering suggestions
-📄 Chord Sheet Generator
-Automatically generate structured chord sheets
-4-bars-per-line formatting
-Song title, key signature, BPM, and time signature
-Export chord sheets as professional PDF files
-🔁 Transpose System
-Transpose chord sheets to any key
-/ - semitone transpose buttons
-Real-time chord updates
-🎹 Guitar Part Composer
-Select:
-Key signature
-Tempo
-Time signature
-Number of bars
-Create custom guitar melodies
-Auto chord suggestions based on notes
-Real-time playback
-Interactive note placement system
-💾 Analysis History
-SQLite database storage
-Save analyzed songs and metadata
-View previous analysis history
-🌐 Modern Web Interface
-Professional dark music-tech UI
-Responsive design
-Navigation bar
-Animated sections
-Interactive popups and cards
-🛠️ Technologies Used
-Backend
-Python
-Flask
-SQLite
-Audio Processing
-Librosa
-NumPy
-SciPy
-SoundFile
-PDF Generation
-ReportLab
-Frontend
-HTML5
-CSS3
-JavaScript
-📂 Project Structure
+---
+
+# 🚀 Live Demo
+
+Add your deployed Render link here:
+
+https://ai-music-analyzer-and-guitar-assistant-1.onrender.com
+
+---
+
+# 📌 Project Overview
+
+AI Music Analyzer & Guitar Assistant is designed to help musicians, guitar learners, and music enthusiasts understand songs more easily.
+
+The system can analyze uploaded MP3/WAV audio files and extract useful musical information such as:
+
+- BPM / tempo
+- Key signature
+- Time signature
+- Chord progression
+- Chord timeline
+- Mood / energy level
+
+It also provides guitar-focused features such as chord sheets, transposition, guitar chord diagrams, piano note visualization, and an interactive guitar part composer.
+
+---
+
+# ✨ Features
+
+## 🎼 Audio Analysis
+
+- Upload MP3 or WAV audio files
+- Detect BPM / tempo
+- Detect key signature with Major / Minor estimation
+- Estimate time signature
+- Detect chords from the song
+- Display chord changes with timestamps
+- Analyze mood / energy level
+
+---
+
+## 🎸 Guitar Assistant
+
+- View detected chords
+- Click chords to see piano notes
+- View guitar chord shapes
+- Display visual guitar chord diagrams
+- Beginner-friendly chord suggestions
+- Suggested strumming patterns
+- Practice BPM recommendation
+
+---
+
+## 📄 Chord Sheet Generator
+
+- Generate chord sheets automatically from detected chords
+- Display chord sheet in bar format
+- Format chords as 4 bars per line
+- Show song name, key signature, time signature, and BPM
+- Export chord sheet as a PDF
+
+Example chord sheet format:
+
+```text
+| C   _   G   _   | E   _   F   _   | G   _   _   F   | C   _   C   _   |
+| C   _   _   _   | E   _   _   _   | G   G   _   F   | C   _   C   _   |
+```
+
+---
+
+## 🔁 Transpose Functionality
+
+- Transpose chord sheet to any selected key
+- Increase key by one semitone
+- Decrease key by one semitone
+- Download PDF chord sheet in the transposed key
+
+---
+
+## 🎹 Compose Your Own Guitar Part
+
+Users can create their own guitar part by selecting:
+
+- Key signature
+- Time signature
+- Tempo
+- Number of bars
+
+The composer allows users to:
+
+- Generate empty beat slots
+- Select notes from the chosen key
+- Fill note slots interactively
+- Automatically suggest chords
+- Play the created guitar part
+
+---
+
+## 💾 Analysis History
+
+- Save analyzed song information using SQLite
+- Store filename, BPM, key, time signature, mood, and chords
+- View previous song analyses
+
+---
+
+# 🛠️ Technologies Used
+
+## Backend
+
+- Python
+- Flask
+- SQLite
+
+## Audio Processing
+
+- Librosa
+- NumPy
+- SciPy
+- SoundFile
+- Audioread
+
+## PDF Generation
+
+- ReportLab
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+
+## Deployment
+
+- Render
+- Gunicorn
+
+---
+
+# 📂 Project Structure
+
+```text
 AI-Music-Analyzer/
 │
 ├── app.py
@@ -70,90 +153,193 @@ AI-Music-Analyzer/
 ├── .gitignore
 │
 ├── uploads/
+│   └── .gitkeep
 │
 ├── static/
 │   ├── css/
+│   │   └── style.css
+│   │
 │   ├── images/
+│   │
 │   ├── sounds/
+│   │
 │   └── waveforms/
+│       └── .gitkeep
 │
-├── templates/
-│   ├── index.html
-│   ├── chords.html
-│   ├── chord_sheet.html
-│   ├── composer.html
-│   └── history.html
-⚙️ Installation
-Clone Repository
-git clone YOUR_REPOSITORY_LINK
-cd AI-Music-Analyzer
-Install Dependencies
+└── templates/
+    ├── index.html
+    ├── chords.html
+    ├── chord_sheet.html
+    ├── composer.html
+    ├── guitar_assistant.html
+    └── history.html
+```
+
+---
+
+# ⚙️ Installation and Setup
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/your-repository-name.git
+cd your-repository-name
+```
+
+---
+
+## 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate virtual environment:
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-Run Application
+```
+
+---
+
+## 4. Run the Application
+
+```bash
 python app.py
+```
 
-Open browser:
+Open in browser:
 
+```text
 http://127.0.0.1:5000
-☁️ Deployment
+```
 
-This project is deployment-ready for:
+---
 
-Render
-Railway
-PythonAnywhere
+# ☁️ Deployment on Render
 
-Production server:
+This project can be deployed on Render using Gunicorn.
 
-gunicorn app:app
-📸 Main Modules
-🎵 Song Analyzer
+## Procfile
 
-Analyze uploaded songs for:
+```text
+web: gunicorn app:app --timeout 180
+```
 
-tempo
-chords
-key
-time signature
-🎸 Guitar Assistant
+## Build Command
 
-Visualize:
+```bash
+pip install -r requirements.txt
+```
 
-piano notes
-guitar chord diagrams
-📄 Chord Sheet Generator
+## Start Command
 
-Generate:
+```bash
+gunicorn app:app --timeout 180
+```
 
-structured chord sheets
-downloadable PDFs
-🎹 Composer
+---
 
-Create custom guitar parts interactively.
+# 📦 Requirements
 
-🔮 Future Improvements
-Real guitar sample playback
-MIDI export
-AI chord correction
-Drag-and-drop composition
-Waveform editor
-User accounts & cloud storage
-Real-time chord recognition
-Mobile app version
-👨‍💻 Author
+Example `requirements.txt`:
 
-Developed by Weenuka Rajapaksha
-Department of Computer Science & Engineering
+```text
+Flask
+gunicorn
+librosa
+numpy
+matplotlib
+soundfile
+audioread
+reportlab
+scipy
+```
+
+---
+
+# ⚠️ Deployment Notes
+
+For cloud deployment, audio processing may require memory optimization.
+
+Recommended `librosa.load()` setting for limited hosting environments:
+
+```python
+y, sr = librosa.load(file_path, sr=22050, duration=60, mono=True)
+```
+
+If using Render free tier, long audio files may take more time to process.
+
+---
+
+# 📸 Screenshots
+
+Add screenshots of your project here.
+
+Example:
+
+```markdown
+![Home Page](static/images/homepage.png)
+![Chord Sheet](static/images/chord-sheet.png)
+![Guitar Assistant](static/images/guitar-assistant.png)
+```
+
+---
+
+# 🔮 Future Improvements
+
+- Real guitar sample playback
+- Drag-and-drop composer
+- MIDI export
+- Advanced chord recognition
+- Better chord correction using key-family theory
+- User accounts
+- Cloud database storage
+- Mobile-friendly version
+- Real-time microphone input analysis
+- AI-based practice recommendations
+
+---
+
+# 👨‍💻 Author
+
+Developed by **Weenuka Rajapaksha**
+
+Department of Computer Science and Engineering  
 University of Moratuwa
 
-⭐ Project Goal
+---
 
-This project aims to combine:
+# 🎯 Project Goal
 
-Music Information Retrieval (MIR)
-Machine Learning
-Audio Signal Processing
-Interactive Music Education
-Guitar Assistance Tools
+The goal of this project is to combine:
 
-into a single intelligent music platform.
+- Audio signal processing
+- Music information retrieval
+- Guitar learning assistance
+- Interactive music composition
+- Web application development
+
+into one intelligent music platform for learners and musicians.
+
+---
+
+# ⭐ If you like this project
+
+Consider giving the repository a star on GitHub.
