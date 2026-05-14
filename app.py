@@ -13,6 +13,9 @@ import json
 
 DB_NAME = "music_analysis.db"
 
+os.makedirs("uploads", exist_ok=True)
+os.makedirs("static/waveforms", exist_ok=True)
+
 
 def init_db():
     conn = sqlite3.connect(DB_NAME)
